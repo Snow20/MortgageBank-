@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+
+  name: mortgage-ingress
+
+  namespace: mortgagebank
+
+spec:
+
+  rules:
+
+    - host:
+        mortgage.local
+
+      http:
+
+        paths:
+
+          - path: /
+
+            pathType: Prefix
+
+            backend:
+
+              service:
+
+                name: frontend
+
+                port:
+
+                  number: 80

@@ -1,0 +1,12 @@
+.DS_Store
+target/
+.mvn/
+node_modules/
+dist/
+.idea/
+*.iml
+.vscode/
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl

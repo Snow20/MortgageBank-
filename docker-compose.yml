@@ -1,0 +1,67 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mortgage-postgres
+    environment:
+      POSTGRES_DB: mortgagebank
+      POSTGRES_USER: mortgage
+      POSTGRES_PASSWORD: mortgagepass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mortgage -d mortgagebank"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: mortgage-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: mortgage
+      RABBITMQ_DEFAULT_PASS: mortgagepass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: mortgage-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mortgagebank
+      SPRING_DATASOURCE_USERNAME: mortgage
+      SPRING_DATASOURCE_PASSWORD: mortgagepass
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: mortgage
+      SPRING_RABBITMQ_PASSWORD: mortgagepass
+      DT_TENANT: "https://your-tenant.live.dynatrace.com"
+      DT_PAAS_TOKEN: "${DYNATRACE_PAAS_TOKEN}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend/mortgage-frontend
+    container_name: mortgage-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

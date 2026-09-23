@@ -1,0 +1,48 @@
+name: MortgageBank CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Compilar y ejecutar pruebas Backend
+        run: |
+          cd backend
+          mvn clean test -DskipTests=false
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Compilar Frontend Angular
+        run: |
+          cd frontend/mortgage-frontend
+          npm ci
+          npm run build
+
+  deploy-ansible:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Ejecutar Playbook de Ansible
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: ansible/deploy.yml
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: ansible/inventory.ini

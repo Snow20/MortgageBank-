@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+
+  name: mortgage-backend
+
+  namespace: mortgagebank
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+    matchLabels:
+      app: mortgage-backend
+
+  template:
+
+    metadata:
+
+      labels:
+        app: mortgage-backend
+
+    spec:
+
+      containers:
+
+        - name: backend
+
+          image:
+            mortgagebank/backend:latest
+
+          ports:
+
+            - containerPort: 8080
+
+          env:
+
+            - name:
+                SPRING_DATASOURCE_URL
+
+              valueFrom:
+
+                configMapKeyRef:
+
+                  name:
+                    mortgage-config
+
+                  key:
+                    SPRING_DATASOURCE_URL
+
+            - name:
+                SPRING_RABBITMQ_HOST
+
+              value:
+                rabbitmq
+
+          resources:
+
+            requests:
+
+              cpu:
+                100m
+
+              memory:
+                256Mi
+
+            limits:
+
+              cpu:
+                500m
+
+              memory:
+                512Mi

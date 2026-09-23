@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+
+  name: mortgage-frontend
+
+  namespace: mortgagebank
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+    matchLabels:
+
+      app: mortgage-frontend
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: mortgage-frontend
+
+    spec:
+
+      containers:
+
+        - name: frontend
+
+          image:
+            mortgagebank/frontend:latest
+
+          ports:
+
+            - containerPort: 80

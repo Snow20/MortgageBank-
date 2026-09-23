@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mortgage-backend
+  labels:
+    app: mortgage-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mortgage-backend
+  template:
+    metadata:
+      labels:
+        app: mortgage-backend
+    spec:
+      containers:
+      - name: backend
+        image: mortgagebank-backend:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-service:5432/mortgagebank"
+        - name: SPRING_RABBITMQ_HOST
+          value: "rabbitmq-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mortgage-backend-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: mortgage-backend

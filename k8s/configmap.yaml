@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: mortgage-config
+  namespace: mortgagebank
+
+data:
+
+  SPRING_RABBITMQ_HOST:
+    rabbitmq
+
+  SPRING_RABBITMQ_PORT:
+    "5672"
+
+  SPRING_DATASOURCE_URL:
+    jdbc:postgresql://postgres:5432/mortgagebank

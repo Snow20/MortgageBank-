@@ -1,0 +1,49 @@
+---
+
+- name: Configure MortgageBank servers
+
+  hosts:
+    mortgage_servers
+
+  become:
+    true
+
+  tasks:
+
+    - name:
+        Update apt cache
+
+      ansible.builtin.apt:
+
+        update_cache:
+          true
+
+
+    - name:
+        Install required packages
+
+      ansible.builtin.apt:
+
+        name:
+
+          - docker.io
+          - curl
+          - git
+
+        state:
+          present
+
+
+    - name:
+        Enable Docker
+
+      ansible.builtin.systemd:
+
+        name:
+          docker
+
+        enabled:
+          true
+
+        state:
+          started
